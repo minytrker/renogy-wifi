@@ -3,6 +3,8 @@
 # Device Info
 DEVICE_ID = "sjc"
 DEVICE_VERSION = "1.0"
+PVOUTPUT_URL = 'http://pvoutput.org/service/r2/addstatus.jsp'
+REMOTE_TIME_URL = 'http://worldtimeapi.org/api/ip'
 
 # MAX32232 IC
 RS232_UART_ID = 0X00

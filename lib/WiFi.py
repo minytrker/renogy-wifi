@@ -18,11 +18,10 @@ class WiFi():
     def connect(self, ssid, password):
         self.ssid = ssid
         self.password = password
-        self.engine.led.blink_onboard_led_processing()
         self.wlan.active(True)
         self.wlan.connect(self.ssid, self.password)
 
-        self.engine.display_logger.log_event("Connecting to {}...".format(self.ssid))
+        self.engine.display.log_event("Connecting to {}...".format(self.ssid))
         timeout = 30
         while timeout > 0:
             if self.wlan.status() < 0 or self.wlan.status() >= 3:
@@ -31,11 +30,9 @@ class WiFi():
             time.sleep(0.5)
 
         if self.wlan.status() == 3:
-            self.engine.led.blink_onboard_led_standby()
-            self.engine.display_logger.log_event("Connected to {}".format(self.ssid))
+            self.engine.display.log_event("Connected to {}".format(self.ssid))
         else:
-            self.engine.led.blink_onboard_led_error()
-            self.engine.display_logger.log_event('Network connection failed')
+            self.engine.display.log_event('Network connection failed')
         self.status_code = self.wlan.status()
         return self.status_code
 
@@ -55,11 +52,9 @@ class WiFi():
             print ("not connected")
             return None
         try:
-            self.engine.led.blink_onboard_led_processing()
             return urequests.request('GET', url, timeout=self.timeout)
         except Exception as err:
             print(f"request failed {url} {str(err)}")
-            self.engine.led.blink_onboard_led_error()
             return None
 
     def fetch_json_data(self, url):
@@ -71,17 +66,15 @@ class WiFi():
         except:
             return None
 
-    def post_request(self, url, data, headers = {}):
-        if (not self.wlan.isconnected()):
+    def post_request(self, url, json = None, data = None, headers = {}):
+        if (not self.is_connected()):
             return None
         try:
-            self.engine.led.blink_onboard_led_processing()
-            response = urequests.request('POST', url, json=data, headers=headers, timeout=self.timeout)
+            response = urequests.request('POST', url, json=json, data = data, headers=headers, timeout=self.timeout)
             content =  response.text
             response.close()
             return content
         except Exception as err:
             print(f"request failed {url} {err}")
             log_error(err)
-            self.engine.led.blink_onboard_led_error()
             return None

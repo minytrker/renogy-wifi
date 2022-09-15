@@ -62,7 +62,7 @@ class SSD1306(framebuf.FrameBuffer):
             0x30,  # 0.83*Vcc
             # display
             SET_CONTRAST,
-            0xA0,  # maximum
+            0x20,  # maximum
             SET_ENTIRE_ON,  # output follows RAM contents
             SET_NORM_INV,  # not inverted
             # charge pump

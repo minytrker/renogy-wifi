@@ -11,4 +11,5 @@ a compact WiFi adapter and remote monitoring display for Renogy¹ brand charge c
 - 0.91" OLED display (add-on, optional)
 
 ### References
-- Modbus Master library is based on pycom-modbus from pycom: https://github.com/pycom/pycom-modbus/
+- Modbus library is based on [pycom/pycom-modbus](https://github.com/pycom/pycom-modbus/)
+- Renogy library is based on [corbinbs/solarshed](https://github.com/corbinbs/solarshed)

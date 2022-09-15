@@ -1,15 +1,14 @@
-# from lib.ConfigManager import ConfigManager
-# from lib.LED import LED
-from lib.DisplayLogger import DisplayLogger
+from lib.Display import Display
 from lib.WiFi import WiFi
+from lib.Logger import Logger
 
 class Engine():
     def __init__(self):
         print("Engine init")
-        self.display_logger = DisplayLogger(self)
-        # self.led = LED(self)
+        self.display = Display(self)
         self.wifi = WiFi(self)
+        self.logger = Logger(self)
 
     def cleanup(self):
-        self.display_logger.poweroff()
+        self.display.poweroff()
         
