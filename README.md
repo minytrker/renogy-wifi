@@ -10,6 +10,7 @@ a compact WiFi adapter and remote monitoring display for Renogy¹ brand charge c
 - Raspberry Pico W (add-on)
 - 0.91" OLED display (add-on, optional)
 
+See [Wiki](https://github.com/thewestlabs/renogy-wifi/wiki) for more details.
 ### References
 - Modbus library is based on [pycom/pycom-modbus](https://github.com/pycom/pycom-modbus/)
 - Renogy library is based on [corbinbs/solarshed](https://github.com/corbinbs/solarshed)
