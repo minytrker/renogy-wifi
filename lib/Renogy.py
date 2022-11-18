@@ -1,6 +1,11 @@
 """
 Driver for the Renogy Rover Solar Controller using the Modbus RTU protocol
 """
+from time import sleep
+import machine
+from umodbus.uModBusFunctions import bytes_to_int, bytes_to_string
+from umodbus.uModBusSerial import uModBusSerial
+
 
 BATTERY_TYPE = {
     1: 'open',
@@ -20,55 +25,67 @@ CHARGING_STATE = {
     6: 'current limiting'
 }
 
+DATA_TYPE = {
+    'INT': 0,
+    'INT_HIGHER': 1,
+    'INT_LOWER': 2,
+    'STRING': 3
+}
+
 class RenogyRover():
     """
-    Communicates using the Modbus RTU protocol (via provided USB<->RS232 cable)
+    Communicates using the Modbus RTU protocol (need RS232 chip)
     """
 
-    def __init__(self, uModBusSerial, slave_addr):
-        self.uModBusSerial = uModBusSerial
+    def __init__(self, slave_addr, uart_id, uart_tx, uart_rx):
+        self.uModBusSerial = uModBusSerial(uart_id, pins=(machine.Pin(uart_tx), machine.Pin(uart_rx)))
         self.slave_addr = slave_addr
+        self.device_busy = False
 
-    def read_register(self, starting_address, numberOfRegisters = 1):
-        values = self.uModBusSerial.read_holding_registers(self.slave_addr, starting_address, numberOfRegisters, True)
-        return values
-        
-    def read_string(self, starting_address, numberOfRegisters = 1):
-        values = self.uModBusSerial.read_holding_registers(self.slave_addr, starting_address, numberOfRegisters, True)
-        return values
+    def read_register(self, starting_address, number_of_registers = 1, type = DATA_TYPE['INT']):
+        if (self.device_busy): sleep(0.2)
+        self.device_busy = True
+        bytes = self.uModBusSerial.read_holding_registers(self.slave_addr, starting_address, number_of_registers, True)
+        value = None
+        if type == DATA_TYPE['INT']:
+            value = bytes_to_int(bytes)
+        elif type == DATA_TYPE['INT_HIGHER']:
+            value = bytes_to_int(bytes, 0, 1)
+        elif type == DATA_TYPE['INT_LOWER']:
+            value = bytes_to_int(bytes, 1, 1)
+        elif type == DATA_TYPE['STRING']:
+            value = bytes_to_string(bytes)
+        self.device_busy = False
+        return value
 
+    def write_register(self, address, value):
+        if (self.device_busy): sleep(0.2)
+        self.device_busy = True
+        values = self.uModBusSerial.write_single_register(self.slave_addr, address, value, False)
+        self.device_busy = False
+        return values
+ 
     def model(self):
-        """
-        Read the controller's model information
-        """
-        return self.read_string(12, numberOfRegisters=8)
+        """ Read the controller's model information """
+        return self.read_register(12, number_of_registers=8, type = DATA_TYPE['STRING'])
 
     def system_voltage_current(self):
         """
         Read the controler's system voltage and current
         Returns a tuple of (voltage, current)
         """
-        register = self.read_register(10)
-        amps = register & 0x00ff
-        voltage = register >> 8
+        amps = self.read_register(10, DATA_TYPE['INT_LOWER'])
+        voltage = amps >> 8
         return (voltage, amps)
 
     def battery_percentage(self):
-        """
-        Read the battery percentage
-        """
-        return self.read_register(256) & 0x00ff
+        return self.read_register(256, DATA_TYPE['INT_LOWER'])
 
     def battery_voltage(self):
-        """
-        Read the battery voltage
-        """
-        return self.read_register(257, numberOfRegisters=1) * 0.1
+        return self.read_register(257, number_of_registers=1) * 0.1
 
     def battery_temperature(self):
-        """
-        Read the battery surface temperature
-        """
+        """ Read the battery surface temperature """
         register = self.read_register(259)
         battery_temp_bits = register & 0x00ff
         temp_value = battery_temp_bits & 0x0ff
@@ -77,9 +94,7 @@ class RenogyRover():
         return battery_temp
 
     def controller_temperature(self):
-        """
-        Read the controller temperature
-        """
+        """ Read the controller temperature """
         register = self.read_register(259)
         controller_temp_bits = register >> 8
         temp_value = controller_temp_bits & 0x0ff
@@ -88,61 +103,37 @@ class RenogyRover():
         return controller_temp
 
     def load_voltage(self):
-        """
-        Read load voltage
-        """
-        return self.read_register(260, numberOfRegisters=1) * 0.1
+        return self.read_register(260, number_of_registers=1) * 0.1
 
     def load_current(self):
-        """
-        Read load current
-        """
-        return self.read_register(261, numberOfRegisters=1) * 0.01
+        return self.read_register(261, number_of_registers=1) * 0.01
 
     def load_power(self):
-        """
-        Read load power
-        """
         return self.read_register(262)
 
     def solar_voltage(self):
-        """
-        Read solar voltage
-        """
-        return self.read_register(263, numberOfRegisters=1) * 0.1
+        return self.read_register(263, number_of_registers=1) * 0.1
 
     def solar_current(self):
-        """
-        Read solar current
-        """
-        return self.read_register(264, numberOfRegisters=1) * 0.01
+        return self.read_register(264, number_of_registers=1) * 0.01
 
     def solar_power(self):
-        """
-        Read solar power
-        """
         return self.read_register(265)
 
     def charging_amp_hours_today(self):
-        """
-        Read charging amp hours for the current day
-        """
         return self.read_register(273)
 
     def discharging_amp_hours_today(self):
-        """
-        Read discharging amp hours for the current day
-        """
         return self.read_register(274)
 
     def power_generation_today(self):
         return self.read_register(275)
 
     def charging_status(self):
-        return self.read_register(288) & 0x00ff
+        return self.read_register(288, DATA_TYPE['INT_LOWER'])
 
     def charging_status_label(self):
-        return CHARGING_STATE.get(self.charging_status())
+        return CHARGING_STATE.get(self.charging_status() )
 
     def battery_capacity(self):
         return self.read_register(57346)
@@ -157,6 +148,15 @@ class RenogyRover():
         register = self.read_register(57348)
         return BATTERY_TYPE.get(register)
 
+    def load_status(self):
+        return  self.read_register(288, 1, DATA_TYPE['INT_HIGHER']) >> 7
+
+    def load_on(self):
+        return self.write_register(266, 1)
+
+    def load_off(self):
+        return self.write_register(266, 0)
+
     def get_info(self):
         print('Model: ', self.model())
         print('Battery %: ', self.battery_percentage())
@@ -167,6 +167,7 @@ class RenogyRover():
         print('Battery Temperature: ', battery_temp, battery_temp * 1.8 + 32)
         controller_temp = self.controller_temperature()
         print('Controller Temperature: ', controller_temp, controller_temp * 1.8 + 32)
+        print('Load Status: ', self.load_status())
         print('Load Voltage: ', self.load_voltage())
         print('Load Current: ', self.load_current())
         print('Load Power: ', self.load_power())

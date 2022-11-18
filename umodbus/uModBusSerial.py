@@ -1,5 +1,5 @@
 # Based on: https://github.com/pycom/pycom-modbus/tree/master/uModbus
-#This file has been modified and differ from its source version.
+# This file has been modified and differ from its source version.
 
 import umodbus.uModBusFunctions as functions
 import umodbus.uModBusConst as Const
@@ -31,12 +31,6 @@ class uModBusSerial:
 
         return struct.pack('<H',crc)
 
-    def _to_short(self, byte_array):
-        return int.from_bytes(byte_array, 'big')
-
-    def _to_string(self, byte_array):
-        return str(byte_array, 'utf-8')
-    
     def _exit_read(self, response):
         if response[1] >= Const.ERROR_BIAS:
             if len(response) < Const.ERROR_RESP_LEN:
@@ -83,7 +77,6 @@ class uModBusSerial:
         return self._validate_resp_hdr(self._uart_read(), slave_addr, modbus_pdu[0], count)
 
     def _validate_resp_hdr(self, response, slave_addr, function_code, count):
-
         if len(response) == 0:
             raise OSError('no data received from slave')
 
@@ -104,19 +97,13 @@ class uModBusSerial:
 
     def read_holding_registers(self, slave_addr, starting_addr, register_qty, signed=True):
         modbus_pdu = functions.read_holding_registers(starting_addr, register_qty)
-
-        resp_data = self._send_receive(modbus_pdu, slave_addr, True)
-        register_value = self._to_string(resp_data) if (register_qty > 2) else self._to_short(resp_data)
-
-        return register_value
+        resp_data = self._send_receive(modbus_pdu, slave_addr, signed)
+        return resp_data
 
     def write_single_register(self, slave_addr, register_address, register_value, signed=True):
-        modbus_pdu = functions.write_single_register(register_address, register_value, signed)
-
-        resp_data = self._send_receive(modbus_pdu, slave_addr, False)
-        operation_status = functions.validate_resp_data(resp_data, Const.WRITE_SINGLE_REGISTER,
-                                                        register_address, value=register_value, signed=signed)
-
+        modbus_pdu = functions.write_single_register(register_address, register_value)
+        resp_data = self._send_receive(modbus_pdu, slave_addr, signed)
+        operation_status = functions.validate_resp_data(resp_data, Const.WRITE_SINGLE_REGISTER, register_address, value=register_value, signed=signed)
         return operation_status
 
     def close(self):

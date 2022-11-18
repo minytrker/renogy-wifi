@@ -18,10 +18,11 @@ class WiFi():
     def connect(self, ssid, password):
         self.ssid = ssid
         self.password = password
-        self.wlan.active(True)
-        self.wlan.connect(self.ssid, self.password)
-
         self.engine.display.log_event("Connecting to {}...".format(self.ssid))
+        time.sleep(1)
+        self.wlan.active(True)
+        self.wlan.config(pm = 0xa11140)  # Disable power-save mode
+        self.wlan.connect(self.ssid, self.password)
         timeout = 30
         while timeout > 0:
             if self.wlan.status() < 0 or self.wlan.status() >= 3:
@@ -29,11 +30,13 @@ class WiFi():
             timeout -= 1
             time.sleep(0.5)
 
-        if self.wlan.status() == 3:
-            self.engine.display.log_event("Connected to {}".format(self.ssid))
-        else:
-            self.engine.display.log_event('Network connection failed')
         self.status_code = self.wlan.status()
+        if self.status_code == 3:
+            self.engine.display.log_event("Connected to {}".format(self.ssid))
+            time.sleep(2)
+        else:
+            self.engine.display.log_event(f"Network connection failed {self.status_code}")
+            time.sleep(2)
         return self.status_code
 
     def disconnect(self):
@@ -52,6 +55,7 @@ class WiFi():
             print ("not connected")
             return None
         try:
+            print (f"fetching {url}")
             return urequests.request('GET', url, timeout=self.timeout)
         except Exception as err:
             print(f"request failed {url} {str(err)}")
@@ -63,7 +67,8 @@ class WiFi():
             json =  response.json()
             response.close()
             return json
-        except:
+        except Exception as e:
+            print (f"fetch_json_data {e}")
             return None
 
     def post_request(self, url, json = None, data = None, headers = {}):
