@@ -11,7 +11,8 @@ a compact WiFi adapter and remote monitoring display for Renogy¹ brand charge c
 - Download this source repo and modify values in `Device.py`
 - Upload the code to your Pico W using Thonny editor (Do not press BOOTSEL now, [read more](https://www.electromaker.io/blog/article/electromaker-educator-getting-started-with-the-pico-w)) 
 
-<img width="300" alt="Screen Shot 2022-11-18 at 10 00 08 AM" src="https://user-images.githubusercontent.com/111796612/202617427-87396a2c-2ff5-4c72-b92d-355385b4fa8f.png">
+<img width="700px" src="https://user-images.githubusercontent.com/111796612/202618561-c0973ac7-efcb-4c31-af6c-e20cfc7628ea.png" />
+
 
 
 ### What's included?
