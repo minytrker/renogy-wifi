@@ -3,12 +3,23 @@
 # Device Info
 DEVICE_ID = "sjc"
 DEVICE_VERSION = "1.0"
+LED_PIN = 'LED'
+EPOCH_DIFF = 7 * 60 * 60
+WIFI_SSID = "WIFI_SSID"
+WIFI_PASSWORD = "WIFI_PASSWORD"
+PVOUTPUT_APIKEY = "PVOUTPUT_APIKEY"
+PVOUTPUT_SYSTEMID = "PVOUTPUT_SYSTEMID"
+
+# URLs for logging
 PVOUTPUT_URL = 'http://pvoutput.org/service/r2/addstatus.jsp'
+REMOTE_LOG_URL = '' # custom logging url
+AUTH_HEADER = "AUTH_HEADER" # custom logging auth
 REMOTE_TIME_URL = 'http://worldtimeapi.org/api/ip'
-REMOTE_LOG_URL = 'http://yourcustomloggingurl'
 
 # MAX32232 IC
-RS232_UART_ID = 0X00
+RS232_UART_ID = 0
+RS232_UART_TX = 0 #10
+RS232_UART_RX = 1 #9
 RS232_SLAVE_ADDR=0XFF
 
 # SD1306 0.91" I2C OLED Display

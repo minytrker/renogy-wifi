@@ -1,9 +1,6 @@
-import json
 import sys
 import re
-from time import sleep
-from machine import ADC, Timer, UART, RTC
-
+from machine import ADC, Timer, RTC
 
 utc_regex = re.compile("-|T|:|\.")
 temp_sensor = ADC(4)
@@ -23,23 +20,12 @@ def log_error(err: Exception):
 def execute_timer(callback, delay):
     Timer().init(mode=Timer.ONE_SHOT, period=int(delay * 1000), callback=lambda t: callback())
 
-def deep_get(d, keys):
-    if not keys or d is None:
-        return d
-    return deep_get(d.get(keys[0]), keys[1:])
+# def execute_timer(callback, delay):
+#     Timer().init(mode=Timer.PERIODIC, period=int(delay * 1000), callback=lambda t: callback())
 
 def read_temperature():
     reading =  temp_sensor.read_u16() * conversion_factor
     return  "{:.2f}".format(27 - (reading - 0.706)/0.001721)
-
-def read_json_file(file):
-    try:
-        f = open(file)
-        json_config = json.load(f)
-        f.close()
-        return json_config
-    except:
-        return {}
 
 def sync_time_from_remote(engine, time_url):
     engine.display.log_event('Syncing time from server...')
@@ -48,6 +34,7 @@ def sync_time_from_remote(engine, time_url):
         engine.display.log_event('Fetching remote time failed')
         return
     try:
+        print (remote_time)
         items = utc_regex.split(remote_time['datetime'])
         day_of_week = int(remote_time['day_of_week'])
         rtc.datetime((int(items[0]), int(items[1]), int(items[2]), day_of_week, int(items[3]), int(items[4]), int(items[5]), 0))
