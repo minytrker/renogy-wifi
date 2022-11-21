@@ -4,7 +4,7 @@ import machine
 import time
 import gc
 from Engine import Engine
-from Device import EPOCH_DIFF, LED_PIN, REMOTE_TIME_URL, WIFI_PASSWORD, WIFI_SSID
+from Device import LED_PIN, REMOTE_TIME_URL, WIFI_PASSWORD, WIFI_SSID
 from utils import log_error, read_time, sync_time_from_remote
 
 led = machine.Pin(LED_PIN, machine.Pin.OUT)
@@ -62,7 +62,6 @@ try:
                 engine.logger.log_pvoutput(f"d={year}{month:02d}{date:02d}&t={hour:02d}:{minute:02d}&v2={rover.solar_power()}")
             if engine.wifi.is_connected() and year > 2021 and hour > 10 and hour < 19 and minute % 15 == 0:
                 engine.logger.log_remote(json.dumps({
-                    'ts': time.time() + EPOCH_DIFF,
                     'pv_voltage': rover.solar_voltage() ,
                     'pv_current': rover.solar_current(),
                     'battery_voltage': rover.battery_voltage(),
