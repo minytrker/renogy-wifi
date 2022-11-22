@@ -6,10 +6,10 @@ Renogy RS232 WiFi adapter and display module
 A compact WiFi adapter and remote monitoring display for Renogy brand charge controllers. It has been tested with Renogy Rover / Adventurer / Wanderer series controllers, it does not support Rover Elite series. However it might work with other 'SRNE' compatible RS232 devices like Rich Solar.
 
 ### Configuration
-- Connect Pico W to your laptop while pressing BOOTSEL button and copy the firmware [uf2](https://micropython.org/download/rp2-pico-w/rp2-pico-w-latest.uf2) file to Pico ([read more](https://www.raspberrypi.com/documentation/microcontrollers/micropython.html#drag-and-drop-micropython))
-- Download thonny editor ([thonny.org](https://thonny.org/))
-- Download `renogy-wifi` source code (this repo) and configure values in [Device.py](https://github.com/thewestlabs/renogy-wifi/blob/main/Device.py#L7-L17)
-- Upload the entire code to your Pico W using Thonny editor (Do not press BOOTSEL now, [read more](https://www.electromaker.io/blog/article/electromaker-educator-getting-started-with-the-pico-w)) 
+1. Connect Pico W to your laptop while pressing BOOTSEL button and copy the firmware [uf2](https://micropython.org/download/rp2-pico-w/rp2-pico-w-latest.uf2) file to Pico ([read more](https://www.raspberrypi.com/documentation/microcontrollers/micropython.html#drag-and-drop-micropython))
+2. Download thonny editor ([thonny.org](https://thonny.org/))
+3. Download `renogy-wifi` source code (this repo) and configure values in [Device.py](https://github.com/thewestlabs/renogy-wifi/blob/main/Device.py#L7-L17)
+4. Upload the entire code to your Pico W using Thonny editor (Do not press BOOTSEL now, [read more](https://www.electromaker.io/blog/article/electromaker-educator-getting-started-with-the-pico-w)) 
 
 <img width="700px" src="https://user-images.githubusercontent.com/111796612/202618561-c0973ac7-efcb-4c31-af6c-e20cfc7628ea.png" />
 
