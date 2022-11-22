@@ -58,11 +58,11 @@ try:
         if second >= 57:
             gc.collect()
             counter = 0
-            if engine.wifi.is_connected() and year > 2021 and hour > 10 and hour < 19:
+            if engine.wifi.is_connected() and year > 2021 and hour > 6 and hour < 19:
                 engine.logger.log_pvoutput(f"d={year}{month:02d}{date:02d}&t={hour:02d}:{minute:02d}&v2={rover.solar_power()}")
-            if engine.wifi.is_connected() and year > 2021 and hour > 10 and hour < 19 and minute % 15 == 0:
+            if engine.wifi.is_connected() and year > 2021 and hour > 6 and hour < 19 and minute % 5 == 0:
                 engine.logger.log_remote(json.dumps({
-                    'pv_voltage': rover.solar_voltage() ,
+                    'pv_voltage': rover.solar_voltage(),
                     'pv_current': rover.solar_current(),
                     'battery_voltage': rover.battery_voltage(),
                     'battery_percentage': rover.battery_percentage(),
